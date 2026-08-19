@@ -19,61 +19,85 @@ export const hero = {
 
 export const benefits = [
   {
-    title: 'Software hecho para tu negocio',
-    description: 'Soluciones únicas que elevan tus procesos y generan ventas sin depender solo de plantillas.',
+    icon: "Clock",
+    title: "Visibilidad 24/7",
+    description:
+      "Tu negocio sigue vendiendo aunque tú estés durmiendo. Un cliente potencial siempre te encuentra.",
   },
   {
-    title: 'Automatiza tareas repetitivas',
-    description: 'Reduce errores y libera horas de operación con flujos digitales fiables y escalables.',
+    icon: "Workflow",
+    title: "Automatización de tareas",
+    description:
+      "Menos trabajo manual, menos errores. Automatizamos citas, cotizaciones y seguimiento de clientes.",
   },
   {
-    title: 'Vende mejor, vende más',
-    description: 'Experiencias de cliente enfocadas en captación, conversión y fidelización digital.',
+    icon: "Users",
+    title: "Captación de clientes",
+    description:
+      "Diseñado para convertir visitantes en leads reales, no solo para 'verse bonito'.",
   },
   {
-    title: 'Soporte y crecimiento continuo',
-    description: 'Proyectos listos para crecer contigo, con mantenimiento claro y mejoras por etapas.',
+    icon: "TrendingUp",
+    title: "Escalable a tu crecimiento",
+    description:
+      "Empiezas simple y tu software crece contigo, sin rehacer todo desde cero.",
   },
 ]
 
-export const pricingPlans = [
+export const differentiators = [
+  "Trato directo y personalizado, sin intermediarios ni call centers",
+  "Soluciones escalables, no plantillas genéricas",
+  "Enfoque en retorno de inversión (ROI), no solo en estética",
+]
+
+export const pricingTiers = [
   {
-    name: 'Lanzamiento',
-    price: '$5,900',
-    description: 'Página web inteligente para profesionales y microempresas.',
-    features: ['Landing de venta', 'Formulario de contacto', 'SEO básico', 'Entrega en 1 semana'],
-    badge: 'Ideal para empezar',
-    highlight: true,
+    id: "nivel-1",
+    name: "Nivel 1 — Presencia Digital",
+    price: "5,000 MXN",
+    tag: "Landing Page / Sitio estático",
+    description:
+      "Sin base de datos ni lógica de backend. Ideal para informar y mostrar tus servicios.",
+    features: ["Diseño responsive", "Hosting y despliegue incluidos", "Optimizado para conversión"],
+    ctaType: "whatsapp",
+    highlighted: false,
   },
   {
-    name: 'Escala',
-    price: '$16,900',
-    description: 'Portal completo y gestión de clientes para negocios que buscan crecer.',
-    features: ['Dashboard administrativo', 'Integración con WhatsApp', 'Automatizaciones simples', 'Soporte 30 días'],
-    badge: 'Más popular',
+    id: "nivel-2",
+    name: "Nivel 2 — Sitio Dinámico",
+    price: "10,000 MXN",
+    tag: "Con base de datos funcional",
+    description:
+      "Ideal para capturar leads, agendar citas o gestionar reservas en línea.",
+    features: ["Base de datos funcional", "Formularios y captura de leads", "Panel básico de gestión"],
+    ctaType: "whatsapp",
+    highlighted: true,
   },
   {
-    name: 'Custom',
-    price: 'Desde $30,900',
-    description: 'Software a la medida para procesos complejos y clientes exigentes.',
-    features: ['Flujos personalizados', 'Conexión con APIs', 'E-commerce / CRM', 'Análisis de datos'],
-    badge: 'Escala nacional',
+    id: "nivel-3",
+    name: "Nivel 3 — Software a la Medida",
+    price: "Desde 15,000 MXN",
+    tag: "Aplicación Web / Software personalizado",
+    description:
+      "El precio varía según complejidad: dominio, servidor dedicado, base de datos, seguridad, agentes de IA, app móvil y arquitectura escalable.",
+    features: ["Arquitectura escalable", "Seguridad de datos", "Agentes de IA / App móvil (opcional)"],
+    ctaType: "quote-form",
+    highlighted: false,
   },
 ]
 
-export const trustItems = [
-  {
-    title: 'Metodología clara',
-    description: 'Definimos entregables, tiempos y resultados desde la propuesta inicial.',
-  },
-  {
-    title: 'Diseño y desarrollo alineado',
-    description: 'UI moderna con experiencia de usuario pensada para ventas y facilidad.',
-  },
-  {
-    title: 'Soporte confiable',
-    description: 'Resolución de dudas y actualizaciones durante el primer mes tras entrega.',
-  },
+export const processSteps = [
+  { step: "01", title: "Levantamiento de requisitos", description: "Entendemos tu negocio y objetivos reales." },
+  { step: "02", title: "Diseño", description: "Prototipo visual alineado a tu marca y a la conversión." },
+  { step: "03", title: "Desarrollo", description: "Construcción del sitio o software con buenas prácticas." },
+  { step: "04", title: "Pruebas", description: "Validamos funcionalidad, velocidad y seguridad." },
+  { step: "05", title: "Entrega", description: "Publicación, capacitación básica y soporte inicial." },
+]
+
+export const budgetBreakdown = [
+  { label: "Horas de programación", percentage: 55 },
+  { label: "Diseño UI/UX", percentage: 25 },
+  { label: "Infraestructura y hosting", percentage: 20 },
 ]
 
 export const contact = {

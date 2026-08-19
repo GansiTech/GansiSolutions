@@ -1,37 +1,51 @@
-import { Check } from 'lucide-react'
+export default function PricingCard({ tier }) {
+  const isQuote = tier.ctaType === "quote-form";
 
-export default function PricingCard({ plan }) {
   return (
-    <article className={`group rounded-3xl border p-8 shadow-sm transition hover:border-accent/50 hover:shadow-accent-glow ${plan.highlight ? 'border-accent/40 bg-base-800' : 'border-base-700 bg-base-900'}`}>
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-accent/80">{plan.badge}</p>
-          <h3 className="mt-4 text-2xl font-semibold text-white">{plan.name}</h3>
-        </div>
-        {plan.highlight ? (
-          <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-            Recomendado
-          </span>
-        ) : null}
-      </div>
-      <p className="mt-6 text-lg font-semibold text-white">{plan.price}</p>
-      <p className="mt-4 text-slate-300">{plan.description}</p>
-      <ul className="mt-8 space-y-4">
-        {plan.features.map((feature) => (
-          <li key={feature} className="flex items-start gap-3 text-slate-300">
-            <Check className="mt-1 h-4 w-4 text-accent" />
-            <span>{feature}</span>
+    <div
+      className={`flex flex-col rounded-2xl border p-8 transition ${
+        tier.highlighted
+          ? "border-accent bg-base-800 shadow-accent-glow"
+          : "border-base-700 bg-base-900 hover:border-accent/40"
+      }`}
+    >
+      {tier.highlighted && (
+        <span className="mb-4 w-fit rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent-light">
+          Más elegido
+        </span>
+      )}
+      <h3 className="font-display text-xl font-semibold text-white">{tier.name}</h3>
+      <p className="mt-1 text-sm text-slate-400">{tier.tag}</p>
+      <p className="mt-6 font-display text-3xl font-bold text-white">
+        {tier.price}
+      </p>
+      <p className="mt-4 text-sm text-slate-300">{tier.description}</p>
+
+      <ul className="mt-6 flex-1 space-y-2 text-sm text-slate-300">
+        {tier.features.map((f) => (
+          <li key={f} className="flex items-start gap-2">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+            {f}
           </li>
         ))}
       </ul>
+
       <a
-        href="https://wa.me/526621234567?text=Hola%2C%20quiero%20más%20información%20sobre%20este%20plan"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-10 inline-flex w-full items-center justify-center rounded-2xl bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-dark"
+        href={
+          isQuote
+            ? "#contacto"
+            : `https://wa.me/526624311791?text=Hola%2C%20me%20interesa%20el%20${encodeURIComponent(
+                tier.name
+              )}`
+        }
+        className={`mt-8 inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition ${
+          tier.highlighted
+            ? "bg-accent text-white hover:bg-accent-dark"
+            : "border border-base-700 text-slate-200 hover:border-accent/50"
+        }`}
       >
-        Cotizar este plan
+        {isQuote ? "Solicitar cotización personalizada" : "Cotizar por WhatsApp"}
       </a>
-    </article>
-  )
+    </div>
+  );
 }

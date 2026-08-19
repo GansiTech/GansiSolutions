@@ -482,3 +482,261 @@ export default function useScrollAnalytics(sectionIds = []) {
 4. Todos los espacios de imagen marcados con `ImagePlaceholder` y comentario indicando qué tipo de imagen debe ir ahí.
 5. Paleta de colores y tipografía aplicadas de forma consistente (negro/gris + azul de acento).
 6. Código limpio, componentizado, comentado donde la lógica de negocio no sea obvia (ej. por qué el Nivel 3 no muestra precio fijo).
+
+## 9. Base de datos
+
+Guía Técnica del Proyecto 
+Descripción 
+Este documento describe la arquitectura técnica y el flujo de trabajo para el desarrollo de la aplicación web. El proyecto
+utiliza: 
+Frontend: React + Vite, con TailwindCSS para estilos.
+Backend: Node.js + Express, con Mongoose para la interacción con MongoDB.
+Base de datos: MongoDB Atlas (NoSQL).
+Despliegue: Vercel, que aloja tanto el frontend como el backend (funciones serverless). 
+El objetivo es proporcionar una guía clara para que todo el equipo pueda programar de manera eficiente, manteniendo
+buenas prácticas y asegurando un despliegue sin contratiempos. 
+Tecnologías utilizadasCapa TecnologíaFrontend React 18, Vite, TailwindCSSBackend Node.js, Express, MongooseComunicación Axios (cliente), CORS (servidor)Base de datos MongoDB AtlasDespliegue VercelEntorno Variables de entorno (.env) 
+Estructura del Proyecto 
+La estructura de carpetas recomendada es la siguiente (puedes adaptarla según tus necesidades): 
+mi-proyecto/
+├── api/ # Punto de entrada para el backend en Vercel
+│ └── index.js # Configuración de Express y conexión a DB
+├── src/ # Código del backend (lógica de negocio)
+│ ├── db/
+│ │ └── connect.js # Patrón singleton para conexión a MongoDB
+│ ├── models/ # Modelos de Mongoose (ej. Usuario, Producto)
+│ ├── routes/ # Definición de rutas de la API
+│ └── controllers/ # Controladores con la lógica de cada endpoint
+├── frontend/ # Aplicación React + Vite
+│ ├── src/
+│ │ ├── components/ # Componentes reutilizables
+│ │ ├── pages/ # Páginas de la aplicación
+│ │ ├── services/ # Configuración de Axios y llamadas a la API
+│ │ ├── hooks/ # Custom hooks
+│ │ └── App.jsx
+│ ├── index.html
+│ ├── package.json
+│ └── vite.config.js
+├── vercel.json # Configuración de despliegue en Vercel
+├── .env # Variables de entorno (no subir a git)
+├── .gitignore
+└── package.json # Dependencias del backend y scripts
+Nota: Puedes optar por tener un único package.json en la raíz y manejar tanto frontend como backend, o
+separar en dos carpetas con sus propios package.json. La estructura anterior es una opción práctica. 
+Configuración inicial 
+1. Clonar el repositorio 
+git clone <url-del-repositorio>
+cd mi-proyecto
+
+2. Instalar dependencias 
+Backend (raíz del proyecto): 
+npm install
+Frontend (dentro de la carpeta frontend): 
+cd frontend
+npm install
+cd ..
+
+3. Variables de entorno 
+Crea un archivo .env en la raíz del proyecto con las siguientes variables: 
+# Conexión a MongoDB Atlas
+MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@cluster0.xxxxx.mongodb.net/<nombre_bd>?retryWrites=true&w=majority
+# Puerto para el servidor local (opcional)
+PORT=5000
+Importante: No subas el archivo .env al repositorio. Asegúrate de que esté incluido en .gitignore. 
+Desarrollo Local 
+Levantar el backend (Express) 
+Desde la raíz del proyecto: 
+npm run dev
+Esto iniciará el servidor en el puerto definido (por defecto 5000) y con recarga automática (usando nodemon si está
+configurado). 
+Levantar el frontend (React + Vite) 
+Desde la carpeta frontend: 
+npm run dev
+El frontend estará disponible en http://localhost:5173 (por defecto) y se comunicará con el backend a través de la URL
+base definida en las variables de entorno del frontend. 
+Nota: Para desarrollo, configura en el frontend un proxy o define la URL base de la API en un archivo de
+configuración (ej. .env.development en el frontend con VITE_API_URL=http://localhost:5000/api). 
+Conexión a MongoDB (Patrón Singleton) 
+El archivo src/db/connect.js implementa un patrón singleton para reutilizar la conexión a MongoDB entre distintasinvocaciones de la función serverless. Esto evita el agotamiento de conexiones, especialmente en el entorno de Vercel. 
+// src/db/connect.js
+import mongoose from 'mongoose';
+let cached = global.mongoose;
+if (!cached) {
+cached = global.mongoose = { conn: null, promise: null };
+}
+async function connectToDatabase() {
+if (cached.conn) {
+return cached.conn;
+}
+ if (!cached.promise) {
+const opts = {
+bufferCommands: false,
+maxPoolSize: 10,
+serverSelectionTimeoutMS: 5000,
+};
+ cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => mongoose);
+}
+cached.conn = await cached.promise;
+return cached.conn;
+}
+export default connectToDatabase;
+Uso en cada ruta o controlador: 
+import connectToDatabase from '../db/connect.js';
+const obtenerUsuarios = async (req, res) => {
+await connectToDatabase();
+// Lógica para obtener usuarios...
+};
+
+Definición de Endpoints y Controladores 
+Estructura de rutas (ejemplo) 
+En src/routes/usuarioRoutes.js: 
+import express from 'express';
+import { getUsuarios, crearUsuario } from '../controllers/usuarioController.js';
+const router = express.Router();
+router.get('/', getUsuarios);
+router.post('/', crearUsuario);
+export default router;
+Controlador (ejemplo) 
+En src/controllers/usuarioController.js: 
+import Usuario from '../models/Usuario.js';
+import connectToDatabase from '../db/connect.js';
+export const getUsuarios = async (req, res) => {
+try {
+await connectToDatabase();
+const usuarios = await Usuario.find();
+res.json(usuarios);
+} catch (error) {
+res.status(500).json({ error: 'Error al obtener usuarios' });
+}
+};
+export const crearUsuario = async (req, res) => {
+try {
+await connectToDatabase();
+const nuevoUsuario = new Usuario(req.body);
+await nuevoUsuario.save();
+res.status(201).json(nuevoUsuario);
+} catch (error) {
+res.status(400).json({ error: 'Error al crear usuario' });
+}
+};
+
+Archivo principal de la API (api/index.js) 
+import express from 'express';
+import cors from 'cors';
+import connectToDatabase from '../src/db/connect.js';
+import usuarioRoutes from '../src/routes/usuarioRoutes.js';
+const app = express();
+app.use(cors());
+app.use(express.json());
+// Conectar a la base de datos en cada solicitud (el singleton optimiza)
+app.use(async (req, res, next) => {
+try {
+await connectToDatabase();
+next();
+} catch (error) {
+res.status(500).json({ error: 'Error de conexión a la base de datos' });
+}
+});
+// Rutas
+app.use('/api/usuarios', usuarioRoutes);
+app.get('/', (req, res) => {
+res.send('API funcionando correctamente');
+});
+export default app;
+Consumo de la API desde el Frontend (React + Axios) 
+Configuración de Axios 
+Crea un archivo frontend/src/services/api.js: 
+import axios from 'axios';
+const api = axios.create({
+baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+headers: {
+'Content-Type': 'application/json',
+},
+});
+export default api;
+
+Ejemplo de uso en un componente 
+import React, { useEffect, useState } from 'react';
+import api from '../services/api';
+const UsuariosList = () => {
+const [usuarios, setUsuarios] = useState([]);
+ useEffect(() => {
+const fetchUsuarios = async () => {
+try {
+const res = await api.get('/usuarios');
+setUsuarios(res.data);
+} catch (error) {
+console.error('Error al obtener usuarios', error);
+}
+};
+fetchUsuarios();
+}, []);
+ return (
+<ul>
+{usuarios.map(u => <li key={u._id}>{u.nombre}</li>)}
+</ul>
+);
+};
+export default UsuariosList;
+
+Despliegue en Vercel 
+1. Configurar vercel.json 
+En la raíz del proyecto: 
+{
+"version": 2,}
+
+"builds": [
+{
+"src": "api/index.js",
+"use": "@vercel/node"
+},
+{
+"src": "frontend/**",
+"use": "@vercel/static-build",
+"config": {
+"distDir": "frontend/dist"
+}
+}
+],
+"routes": [
+{
+"src": "/api/(.*)",
+"dest": "api/index.js"
+},
+{
+"src": "/(.*)",
+"dest": "frontend/dist/$1"
+}
+]
+2. Variables de entorno en Vercel 
+En el dashboard de Vercel, ve a tu proyecto > Settings > Environment Variables y agrega: 
+MONGODB_URI: la cadena de conexión a MongoDB Atlas.
+VITE_API_URL: (opcional) la URL de tu API desplegada (ej. https://tu-app.vercel.app/api). 
+3. Comandos de despliegue 
+Primera vez: conéctate con vercel (CLI) o conecta tu repositorio de GitHub en el dashboard.
+Actualizaciones: cada push a la rama principal (main/master) disparará un despliegue automático si tienes integración
+con GitHub. 
+4. Verificar despliegue 
+Accede a https://tu-app.vercel.app/api para comprobar que el backend responde, y a la raíz para ver el frontend. 
+Flujo de trabajo para el equipo 
+Crear una nueva rama para cada feature o bugfix desde main.
+Desarrollar localmente levantando backend y frontend.
+Probar los endpoints con herramientas como Postman o el propio frontend.
+Hacer commits con mensajes claros y descriptivos.
+Crear un Pull Request hacia main.
+Revisión de código y aprobación.
+Merge y despliegue automático en Vercel. 
+Comandos útilesComandonpm installcd frontend && npm installnpm run devDescripciónInstala dependencias del backend.Instala dependencias del frontend.cd frontend && npm run dev Inicia el frontend en modo desarrollo.npm start Inicia el backend en producción (ej. en Vercel).cd frontend && npm run build Construye el frontend para producción.vercel --prod Despliega a producción usando la CLI de Vercel.Buenas prácticas 
+
+Validación de datos: Usa Mongoose validations o librerías como Joi para validar los datos de entrada.
+Manejo de errores: Siempre envía respuestas de error con códigos HTTP apropiados.
+Seguridad: No expongas información sensible en los logs. Usa variables de entorno para todo lo que sea secreto.
+Rendimiento: Limita el número de documentos devueltos en consultas (usando limit, skip) y utiliza índices en
+MongoDB.
+CORS: Configura CORS adecuadamente para permitir solo los orígenes necesarios en producción.
+Tests: Escribe pruebas unitarias y de integración para asegurar la estabilidad. 
+Recursos adicionales 
+Documentación de Vercel para Node.js
+Mongoose Guide
+React + Vite 
+¡Listo! Con esta guía, el equipo tendrá una base sólida para desarrollar y desplegar la aplicación de manera eficiente
