@@ -14,7 +14,8 @@ import { contact } from './data/content';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-base-950 text-white">
+      <Routes>
+        <Route path="/" element={ <div className="min-h-screen bg-base-950 text-white">
         <Navbar />
         <main>
           <Hero />
@@ -26,10 +27,10 @@ function App() {
         <Footer />
         <WhatsAppButton href={contact.whatsappLink} />
         <CookieBanner />
-        <Routes>
-          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-        </Routes>
-      </div>
+        
+      </div>} />
+      <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+      </Routes>
     </Router>
   );
 }

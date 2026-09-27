@@ -94,6 +94,7 @@ export default function CookiePolicyPage() {
             </li>
           </ul>
         </div>
+        <button onClick={() => window.location.href = '/'} className="mt-6 px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">Volver a la página principal</button>
       </motion.div>
     </section>
   );

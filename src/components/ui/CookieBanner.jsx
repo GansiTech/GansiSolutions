@@ -26,7 +26,7 @@ export default function CookieBanner() {
       <div className="flex flex-col items-center sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="text-center sm:text-left">
           <p className="mb-2">
-            Utilizamos cookies para mejorar tu experiencia en nuestro sitio. Al continuar navegando, aceptas nuestro
+            Utilizamos cookies para mejorar tu experiencia en nuestro sitio. Al continuar navegando, aceptas nuestro. <br />
             <Link to="/cookie-policy" className="text-accent underline">
               política de cookies
             </Link>
