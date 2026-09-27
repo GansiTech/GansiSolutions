@@ -6,10 +6,14 @@ export default function useScrollAnalytics(sectionIds = []) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Reemplazar con el proveedor real: GA4, Plausible, Meta Pixel, etc.
-            window?.gtag?.("event", "section_view", {
-              section_id: entry.target.id,
-            });
+            // Check cookie consent before tracking
+            const consentGiven = localStorage.getItem('cookieConsent') === 'true';
+            if (consentGiven) {
+              // Reemplazar con el proveedor real: GA4, Plausible, Meta Pixel, etc.
+              window?.gtag?.("event", "section_view", {
+                section_id: entry.target.id,
+              });
+            }
           }
         });
       },
