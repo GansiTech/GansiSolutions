@@ -1,8 +1,7 @@
 export const navigation = [
-  { label: 'Inicio', href: '#hero' },
   { label: 'Beneficios', href: '#beneficios' },
   { label: 'Precios', href: '#precios' },
-  { label: 'Confianza', href: '#confianza' },
+  { label: 'Proceso', href: '#confianza' },
   { label: 'Contacto', href: '#contacto' },
 ]
 
@@ -10,7 +9,8 @@ export const hero = {
   pretitle: 'Desarrollo de software a la medida en Hermosillo',
   title: 'Si lo puedes imaginar, lo podemos crear.',
   description:
-    'Ayudamos a PyMEs a escalar con sitios web, plataformas y automatizaciones pensadas para vender más y operar mejor.',
+    'Convertimos tu idea de negocio en un sitio web o aplicación real, diseñado para vender y crecer contigo.',
+  priceHint: 'Planes desde 5,000 MXN · Cotización sin compromiso',
   ctaText: 'Cotiza por WhatsApp',
   ctaLink:
     'https://wa.me/526624311791?text=Hola%2C%20quiero%20cotizar%20un%20proyecto',
@@ -53,34 +53,34 @@ export const differentiators = [
 export const pricingTiers = [
   {
     id: "nivel-1",
-    name: "Nivel 1 — Presencia Digital",
+    name: "Presencia Digital",
     price: "5,000 MXN",
-    tag: "Landing Page / Sitio estático",
+    tag: "Nivel 1 · Página informativa",
     description:
-      "Sin base de datos ni lógica de backend. Ideal para informar y mostrar tus servicios.",
-    features: ["Diseño responsive", "Hosting y despliegue incluidos", "Optimizado para conversión"],
+      "Una página para presentar tu negocio y que los clientes te contacten. Ideal si estás empezando.",
+    features: ["Se ve bien en celular y computadora", "Publicación y hosting incluidos", "Diseñado para que te contacten"],
     ctaType: "whatsapp",
     highlighted: false,
   },
   {
     id: "nivel-2",
-    name: "Nivel 2 — Sitio Dinámico",
+    name: "Sitio con Reservas y Clientes",
     price: "10,000 MXN",
-    tag: "Con base de datos funcional",
+    tag: "Nivel 2 · Sitio con base de datos",
     description:
-      "Ideal para capturar leads, agendar citas o gestionar reservas en línea.",
-    features: ["Base de datos funcional", "Formularios y captura de leads", "Panel básico de gestión"],
+      "Recibe citas, reservas o solicitudes de clientes en línea y adminístralas desde un panel.",
+    features: ["Base de datos para tu información", "Formularios que guardan los datos de tus clientes", "Panel para gestionar citas y solicitudes"],
     ctaType: "whatsapp",
     highlighted: true,
   },
   {
     id: "nivel-3",
-    name: "Nivel 3 — Software a la Medida",
+    name: "Software a la Medida",
     price: "Desde 15,000 MXN",
-    tag: "Aplicación Web / Software personalizado",
+    tag: "Nivel 3 · Aplicación web o móvil",
     description:
-      "El precio varía según complejidad: dominio, servidor dedicado, base de datos, seguridad, agentes de IA, app móvil y arquitectura escalable.",
-    features: ["Arquitectura escalable", "Seguridad de datos", "Agentes de IA / App móvil (opcional)"],
+      "Un sistema hecho para la operación de tu empresa. El precio final depende de lo que necesites; te damos una cotización detallada.",
+    features: ["Preparado para crecer con tu negocio", "Protección de los datos de tus clientes", "Opcional: app móvil y asistentes con IA"],
     ctaType: "quote-form",
     highlighted: false,
   },
@@ -101,9 +101,9 @@ export const budgetBreakdown = [
 ]
 
 export const contact = {
-  title: 'Listo para lanzar tu idea?',
+  title: '¿Listo para lanzar tu idea?',
   subtitle:
-    'Contacta por WhatsApp o deja tus datos. Te responderemos con una propuesta clara y sin compromiso.',
+    'Escríbenos por WhatsApp o llena el formulario. Te respondemos con una propuesta clara y sin compromiso.',
   phone: '+52 662 431 1791',
   email: 'fernandogc.2912@hotmail.com',
   whatsappLink: 'https://wa.me/526624311791?text=Hola%2C%20quiero%20cotizar%20un%20proyecto',

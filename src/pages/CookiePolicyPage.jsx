@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function CookiePolicyPage() {
   return (
-    <section
+    <main
       id="cookie-policy"
-      className="relative overflow-hidden bg-base-950 pt-32 pb-24"
+      className="relative overflow-hidden bg-base-950 pt-16 pb-24"
     >
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -25,7 +26,7 @@ export default function CookiePolicyPage() {
           <h2 className="text-2xl font-semibold text-accent mt-6 mb-3">¿Qué son las cookies?</h2>
           <p className="mb-4">
             Las cookies son pequeños archivos de texto que se almacenan en su dispositivo (ordenador, tablet o móvil)
-            cuando visita un sitio web. Nos ayudamos a recordar información sobre su visita, como sus preferencias
+            cuando visita un sitio web. Nos ayudan a recordar información sobre su visita, como sus preferencias
             y configuraciones, para hacer que su próxima visita sea más útil y el sitio sea más personal para usted.
           </p>
 
@@ -39,7 +40,7 @@ export default function CookiePolicyPage() {
             <li>
               <strong>Cookies de rendimiento y analítica:</strong> Nos permiten contar visitas y fuentes de tráfico para
               poder medir y mejorar el rendimiento de nuestro sitio. Nos ayudan a saber qué páginas son las más y menos
-              populares y ver cómo se mueven los visitantes por el sitio. Todas la información que estas cookies
+              populares y ver cómo se mueven los visitantes por el sitio. Toda la información que estas cookies
               recopilan es agregada y, por lo tanto, anónima.
             </li>
             <li>
@@ -94,8 +95,22 @@ export default function CookiePolicyPage() {
             </li>
           </ul>
         </div>
-        <button onClick={() => window.location.href = '/'} className="mt-6 px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">Volver a la página principal</button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('cookie-preferences-open'))}
+            className="rounded-lg bg-accent px-4 py-2.5 font-semibold text-white transition hover:bg-accent-dark"
+          >
+            Cambiar mis preferencias de cookies
+          </button>
+          <Link
+            to="/"
+            className="rounded-lg border border-base-700 px-4 py-2.5 font-semibold text-slate-200 transition hover:border-accent/50"
+          >
+            Volver al inicio
+          </Link>
+        </div>
       </motion.div>
-    </section>
+    </main>
   );
 }

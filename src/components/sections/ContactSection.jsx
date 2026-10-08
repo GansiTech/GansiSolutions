@@ -1,78 +1,100 @@
 import { MessageCircle, Mail, Phone } from 'lucide-react'
 import { contact } from '../../data/content'
 import { useState } from 'react'
+import Reveal from '../ui/Reveal'
+
+const initialForm = {
+  name: '',
+  company: '',
+  projectType: 'Estático',
+  phone: ''
+}
+
+const inputClass =
+  'w-full rounded-lg border bg-base-900 px-4 py-3 text-white placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40'
+
+function validate(field, value) {
+  if (field === 'name' && !value.trim()) return 'Escribe tu nombre.'
+  if (field === 'phone') {
+    const digits = value.replace(/\D/g, '')
+    if (!digits) return 'Escribe un teléfono para poder contactarte.'
+    if (digits.length < 10) return 'El teléfono debe tener al menos 10 dígitos.'
+  }
+  return ''
+}
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: '',
-    company: '',
-    projectType: 'Estático',
-    phone: ''
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState(null) // null, 'success', 'error'
+  const [formData, setFormData] = useState(initialForm)
+  const [errors, setErrors] = useState({})
+  const [sentUrl, setSentUrl] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
+    // Si el campo ya tenía error, se corrige mientras el usuario escribe
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: validate(name, value) }))
+  }
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target
+    setErrors(prev => ({ ...prev, [name]: validate(name, value) }))
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus(null)
 
-    // Validate form
-    if (!formData.name || !formData.company || !formData.phone) {
-      setSubmitStatus('error')
-      setIsSubmitting(false)
+    const newErrors = {
+      name: validate('name', formData.name),
+      phone: validate('phone', formData.phone)
+    }
+    setErrors(newErrors)
+    const firstInvalid = Object.keys(newErrors).find((key) => newErrors[key])
+    if (firstInvalid) {
+      document.getElementById(`contact-${firstInvalid}`)?.focus()
       return
     }
 
-    // Create WhatsApp message with form data
+    const company = formData.company.trim() ? ` de ${formData.company.trim()}` : ''
     const message = `
-Hola, soy ${formData.name} de ${formData.company}.
+Hola, soy ${formData.name.trim()}${company}.
 Mi teléfono es: ${formData.phone}
-Tipo de proyecto interestado: ${formData.projectType}
+Tipo de proyecto: ${formData.projectType}
 
 Quisiera cotizar un proyecto de desarrollo de software a la medida.
     `.trim()
 
-    // URL encode the message
-    const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/526624311791?text=${encodedMessage}`
-
-    // Open WhatsApp in new tab
-    window.open(whatsappUrl, '_blank')
-
-    // Show success status
-    setSubmitStatus('success')
-
-    // Reset form after success
-    setFormData({
-      name: '',
-      company: '',
-      projectType: 'Estático',
-      phone: ''
-    })
-
-    // Reset submitting state after a brief delay
-    setTimeout(() => {
-      setIsSubmitting(false)
-    }, 1000)
+    const whatsappUrl = `https://wa.me/526624311791?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank', 'noopener')
+    setSentUrl(whatsappUrl)
+    setFormData(initialForm)
   }
 
+  const fieldProps = (name) => ({
+    id: `contact-${name}`,
+    name,
+    value: formData[name],
+    onChange: handleChange,
+    onBlur: handleBlur,
+    'aria-invalid': errors[name] ? true : undefined,
+    'aria-describedby': errors[name] ? `contact-${name}-error` : undefined,
+    className: `${inputClass} ${errors[name] ? 'border-red-400' : 'border-base-700'}`
+  })
+
+  const fieldError = (name) =>
+    errors[name] && (
+      <p id={`contact-${name}-error`} className="mt-2 text-sm text-red-400">
+        {errors[name]}
+      </p>
+    )
+
   return (
-    <section id="contacto" className="base-950 py-24">
+    <section id="contacto" className="bg-base-950 py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-12 md:grid-cols-[1.3fr_1fr] items-start">
+        <div className="grid items-start gap-12 md:grid-cols-[1.3fr_1fr]">
           {/* Información de contacto */}
-          <div>
+          <Reveal>
             <p className="mb-4 inline-flex rounded-full border border-accent/30 bg-accent/10 px-4 py-1 text-sm font-semibold uppercase tracking-[0.18em] text-accent-light">
-              Contacto directo
+              Contacto
             </p>
             <h2 className="font-display text-3xl font-bold leading-tight text-white sm:text-4xl">
               {contact.title}
@@ -87,7 +109,7 @@ Quisiera cotizar un proyecto de desarrollo de software a la medida.
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 rounded-xl border border-base-700 px-6 py-3.5 font-semibold text-slate-200 transition hover:border-accent/50"
               >
-                <Phone className="h-5 w-5 flex-shrink-0" />
+                <Phone className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
                 <div>
                   <span className="block font-medium text-white">WhatsApp</span>
                   <span className="text-sm text-slate-300">{contact.phone}</span>
@@ -97,113 +119,79 @@ Quisiera cotizar un proyecto de desarrollo de software a la medida.
                 href={`mailto:${contact.email}`}
                 className="flex items-center gap-4 rounded-xl border border-base-700 px-6 py-3.5 font-semibold text-slate-200 transition hover:border-accent/50"
               >
-                <Mail className="h-5 w-5 flex-shrink-0" />
-                <div>
+                <Mail className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                <div className="min-w-0">
                   <span className="block font-medium text-white">Correo electrónico</span>
-                  <span className="text-sm text-slate-300">{contact.email}</span>
+                  <span className="break-all text-sm text-slate-300">{contact.email}</span>
                 </div>
               </a>
             </div>
-          </div>
+          </Reveal>
 
           {/* Formulario de contacto */}
-          <div className="base-800 rounded-2xl border border-base-700 p-8">
-            <h3 className="mb-6 font-display text-xl font-semibold text-white">
-              Envíanos un mensaje
+          <Reveal delay={0.15} className="rounded-2xl border border-base-700 bg-base-800 p-8">
+            <h3 className="font-display text-xl font-semibold text-white">
+              Cuéntanos de tu proyecto
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <p className="mt-2 mb-6 text-sm text-slate-400">
+              Al enviar se abrirá WhatsApp con tu mensaje listo.
+            </p>
+            <form onSubmit={handleSubmit} noValidate className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-slate-300">
-                    Nombre completo
+                  <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-slate-300">
+                    Nombre
                   </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-base-700 bg-base-900 text-white placeholder-slate-400 focus:border-accent/50 focus:outline-none"
-                    placeholder="Tu nombre"
-                  />
+                  <input type="text" autoComplete="name" placeholder="Tu nombre" {...fieldProps('name')} />
+                  {fieldError('name')}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-slate-300">
-                    Empresa u organización
+                  <label htmlFor="contact-company" className="mb-2 block text-sm font-medium text-slate-300">
+                    Empresa <span className="font-normal text-slate-400">(opcional)</span>
                   </label>
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-base-700 bg-base-900 text-white placeholder-slate-400 focus:border-accent/50 focus:outline-none"
-                    placeholder="Nombre de tu empresa"
-                  />
+                  <input type="text" autoComplete="organization" placeholder="Nombre de tu empresa" {...fieldProps('company')} />
                 </div>
               </div>
 
               <div>
-                <label className="block mb-2 text-sm font-medium text-slate-300">
-                  Tipo de proyecto
+                <label htmlFor="contact-projectType" className="mb-2 block text-sm font-medium text-slate-300">
+                  ¿Qué necesitas?
                 </label>
-                <select
-                  name="projectType"
-                  value={formData.projectType}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-base-700 bg-base-900 text-white placeholder-slate-400 focus:border-accent/50 focus:outline-none"
-                >
-                  <option value="Estático">Sitio web estático / Landing page</option>
-                  <option value="Dinámico">Portal web con base de datos</option>
-                  <option value="Aplicación / Software a la medida">Software personalizado</option>
+                <select {...fieldProps('projectType')}>
+                  <option value="Estático">Página informativa (Nivel 1)</option>
+                  <option value="Dinámico">Sitio con reservas o clientes (Nivel 2)</option>
+                  <option value="Aplicación / Software a la medida">Software a la medida (Nivel 3)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block mb-2 text-sm font-medium text-slate-300">
-                  Teléfono de contacto
+                <label htmlFor="contact-phone" className="mb-2 block text-sm font-medium text-slate-300">
+                  Teléfono
                 </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-base-700 bg-base-900 text-white placeholder-slate-400 focus:border-accent/50 focus:outline-none"
-                  placeholder="+52 1 234 567 8900"
-                />
+                <input type="tel" autoComplete="tel" inputMode="tel" placeholder="662 123 4567" {...fieldProps('phone')} />
+                {fieldError('phone')}
               </div>
 
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`inline-flex items-center gap-2 rounded-xl px-6 py-3.5 font-semibold text-white transition ${
-                    isSubmitting
-                      ? "bg-accent/50 cursor-not-allowed"
-                      : "bg-accent hover:bg-accent-dark"
-                  }`}
-                >
-                  {isSubmitting ? 'Enviando...' : 'Enviar mensaje'}
-                  {!isSubmitting && (
-                    <MessageCircle className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 font-semibold text-white transition hover:bg-accent-dark"
+              >
+                Continuar en WhatsApp
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              </button>
 
-              {/* Mensaje de estado */}
-              {submitStatus === 'success' && (
-                <p className="mt-4 text-sm text-accent/80">
-                  ¡Listo! Se ha abierto WhatsApp para enviarnos tu mensaje.
-                </p>
-              )}
-              {submitStatus === 'error' && (
-                <p className="mt-4 text-sm text-red-500">
-                  Por favor completa todos los campos requeridos.
-                </p>
-              )}
+              <div role="status" aria-live="polite">
+                {sentUrl && (
+                  <p className="text-sm text-slate-300">
+                    Listo, tu mensaje está en WhatsApp. Solo presiona enviar ahí.{' '}
+                    <a href={sentUrl} target="_blank" rel="noopener noreferrer" className="text-accent-light underline">
+                      ¿No se abrió? Ábrelo aquí
+                    </a>
+                  </p>
+                )}
+              </div>
             </form>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>
