@@ -7,6 +7,8 @@ export default function CookiePolicyPage() {
       id="cookie-policy"
       className="relative overflow-hidden bg-base-950 pt-16 pb-24"
     >
+      <title>Política de Cookies | GansiSolutions</title>
+      <meta name="robots" content="noindex, follow" />
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
